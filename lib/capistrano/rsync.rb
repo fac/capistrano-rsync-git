@@ -34,8 +34,11 @@ namespace "rsync" do
   task :stage => [ :create_cache ] do
     run_locally do
       within fetch(:local_cache) do
+        # Allow a branch name or a sha in :branch
+        commit = fetch :branch
+        commit = "origin/#{commit}" if test :git, "rev-parse", "--verify", "origin/#{commit}"
         execute :git, "fetch", "--quiet", "--all", "--prune"
-        execute :git, "reset", "--hard", "origin/#{fetch(:branch)}"
+        execute :git, "reset", "--hard", commit
       end
     end
   end
